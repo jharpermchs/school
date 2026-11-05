@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Harper Seating Charts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&family=Big+Shoulders+Display:wght@700;800&display=swap">
+<style>
+/* Layout: Cardinal header band, then the classroom drawn to scale as the hero, with a working sidebar for roster and arranging. */
+:root{
+  --cardinal:#8b2331; --gold:#c7b683; --navy:#0c223f;
+  --surface:#ffffff; --surface-raised:#f5f2ec; --surface-sunk:#ece7dc;
+  --ink:#0c223f; --ink-muted:#4a5568; --on-brand:#ffffff; --on-accent:#0c223f;
+  --border:#ded8cb; --border-strong:#6f6a5c; --focus:#8b2331; --ring:#8b2331;
+  --table:#ece2cb; --table-edge:#b9a77a; --seat:#ffffff; --lock-bg:#e3e9f2; --select-bg:#f7e7e9; --target-bg:#fbf8f1;
+  --font-body: Jost, "Avenir Next", Futura, system-ui, sans-serif;
+  --font-display: "Futura Condensed Extra Bold", "Futura Condensed", Jost, "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  --font-sign: "Big Shoulders Display", Jost, Impact, sans-serif;
+  --r-sm:4px; --r-md:8px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --surface:#0c223f; --surface-raised:#16304f; --surface-sunk:#0a1d36;
+    --ink:#ffffff; --ink-muted:#ccd5e3; --border:#294a70; --border-strong:#7f97b5; --focus:#c7b683; --ring:#c7b683;
+    --table:#1f3d62; --table-edge:#4f6f96; --seat:#0f2847; --lock-bg:#27486f; --select-bg:#3b2340; --target-bg:#13304f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --surface:#0c223f; --surface-raised:#16304f; --surface-sunk:#0a1d36;
+  --ink:#ffffff; --ink-muted:#ccd5e3; --border:#294a70; --border-strong:#7f97b5; --focus:#c7b683; --ring:#c7b683;
+  --table:#1f3d62; --table-edge:#4f6f96; --seat:#0f2847; --lock-bg:#27486f; --select-bg:#3b2340; --target-bg:#13304f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--surface);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.ic{width:18px;height:18px;flex:none}
+
+/* Header band */
+.band{background:var(--cardinal);color:var(--on-brand);border-bottom:4px solid var(--gold)}
+.band-in{max-width:1440px;margin:0 auto;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.9;margin:0}
+.band h1{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,3.4vw,36px);line-height:1.1;margin:2px 0 0;text-wrap:balance}
+.status{font-size:13px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.status[data-s="saving"] .dot{background:#fff;opacity:.7}
+.status[data-s="error"] .dot{background:#fff;box-shadow:0 0 0 2px var(--gold)}
+
+/* Shell */
+.app{max-width:1440px;margin:0 auto;padding-block:16px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;justify-content:space-between}
+.periods{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.chip{border:1px solid var(--border-strong);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:500;white-space:nowrap;transition:background .15s,color .15s}
+.chip:hover{background:var(--surface-raised)}
+.chip[aria-current="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+:root[data-theme="dark"] .chip[aria-current="true"]{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-current="true"]{background:var(--gold);border-color:var(--gold);color:var(--navy)}}
+.chip.ghost{border-style:dashed;display:inline-flex;align-items:center;gap:6px}
+.newform{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.newform input{border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:6px 10px;background:var(--surface);min-width:0;width:220px;max-width:100%}
+.viewctl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:var(--r-sm);overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-weight:500;transition:background .15s}
+.seg button+button{border-left:1px solid var(--border-strong)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--gold);color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{background:var(--gold);color:var(--navy)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--r-sm);padding:8px 14px;cursor:pointer;font-weight:500;transition:background .15s}
+.btn:hover{background:var(--surface-raised)}
+.btn.primary{background:var(--cardinal);border-color:var(--cardinal);color:var(--on-brand)}
+.btn.primary:hover{background:#741d29}
+.btn.small{padding:5px 10px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.danger{color:var(--cardinal);border-color:var(--cardinal)}
+:root[data-theme="dark"] .btn.danger{color:#ffb3bd;border-color:#ffb3bd}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.danger{color:#ffb3bd;border-color:#ffb3bd}}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+@media (max-width: 980px){.work{grid-template-columns:minmax(0,1fr)}}
+.chart-wrap{min-width:0;display:flex;flex-direction:column;gap:8px}
+.tips{font-size:14px;color:var(--ink-muted);margin:0}
+
+/* Room */
+.room{container-type:inline-size;border:2px solid var(--border-strong);border-radius:var(--r-md);background:var(--surface-raised);padding:2.4cqw;display:flex;flex-direction:column;gap:2.6cqw}
+.room.spin{animation:spin .45s ease-in-out forwards}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+.wall{display:flex;align-items:center;justify-content:center;gap:1.2cqw;font-family:var(--font-sign);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(13px,2.3cqw,40px);padding:.9cqw;border-radius:var(--r-sm)}
+.wall.front{background:var(--gold);color:var(--on-accent)}
+.wall.back{border:2px dashed var(--border-strong);color:var(--ink-muted)}
+.wall small{font-family:var(--font-body);font-weight:500;letter-spacing:.02em;text-transform:none;font-size:.55em;opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6cqw;row-gap:3.2cqw}
+.table{position:relative;background:var(--table);border:2px solid var(--table-edge);border-radius:var(--r-sm);height:9cqw;min-height:52px;padding:.6cqw;display:flex}
+.tnum{position:absolute;top:0;left:50%;transform:translate(-50%,-55%);min-width:3.6cqw;height:3.6cqw;min-height:20px;min-width:20px;padding:0 .6cqw;border-radius:999px;background:var(--cardinal);color:#fff;font-family:var(--font-sign);font-weight:800;font-size:clamp(12px,2.2cqw,38px);display:flex;align-items:center;justify-content:center;line-height:1;z-index:2}
+.seats{display:flex;flex:1;gap:.6cqw;min-width:0}
+.seat{position:relative;flex:1;min-width:0;display:flex}
+.seat-main{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:3px;padding:.5cqw .6cqw;cursor:pointer;font-weight:600;font-size:clamp(10px,2.05cqw,36px);line-height:1.1;overflow-wrap:break-word;hyphens:auto;transition:background .15s, box-shadow .15s;user-select:none}
+.seat.filled .seat-main{background:var(--seat);border:1px solid var(--border)}
+.seat.empty .seat-main{border:1px dashed var(--table-edge);color:var(--ink-muted)}
+.seat.locked .seat-main{background:var(--lock-bg)}
+.seat.sel .seat-main{box-shadow:0 0 0 3px var(--ring);background:var(--select-bg)}
+.seat.dragover .seat-main{box-shadow:0 0 0 3px var(--ring)}
+body.placing .seat .seat-main:hover{box-shadow:0 0 0 2px var(--ring);background:var(--target-bg)}
+.nm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.seat-tools{position:absolute;top:2px;right:2px;display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.seat:hover .seat-tools,.seat:focus-within .seat-tools,.seat.sel .seat-tools{opacity:1}
+.mini{width:22px;height:22px;border-radius:3px;border:1px solid var(--border-strong);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.mini .ic{width:13px;height:13px}
+.mini[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.lockmark{position:absolute;left:3px;top:3px;color:var(--ink-muted);display:flex}
+.lockmark .ic{width:12px;height:12px}
+.big{grid-column:auto;background:repeating-linear-gradient(135deg,var(--table) 0 10px,var(--surface-sunk) 10px 20px);border:2px solid var(--table-edge);border-radius:var(--r-sm);height:9cqw;min-height:52px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-sign);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-muted);font-size:clamp(11px,1.8cqw,30px);line-height:1.1}
+.big span{background:var(--surface-raised);padding:.3cqw 1cqw;border-radius:3px}
+
+/* Sidebar */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font-family:var(--font-display);font-weight:800;font-size:20px;line-height:1.2;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 .count{font-family:var(--font-body);font-weight:500;font-size:13px;color:var(--ink-muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row .btn{flex:1 1 auto}
+.lbl{font-size:13px;color:var(--ink-muted);letter-spacing:.04em;text-transform:uppercase}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
+.chk input{margin-top:4px;accent-color:var(--cardinal)}
+.hint{font-size:13px;color:var(--ink-muted);margin:0}
+textarea{width:100%;min-height:150px;border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:8px 10px;background:var(--surface);resize:vertical;line-height:1.4}
+.text-in{border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:6px 10px;background:var(--surface);flex:1;min-width:0}
+.roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;max-height:420px;overflow:auto}
+.roster.dropzone{outline:2px dashed var(--ring);outline-offset:2px;border-radius:var(--r-sm)}
+.group{font-size:12px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 4px 2px}
+.stu{display:flex;align-items:center;gap:6px;border-radius:var(--r-sm);padding:2px 4px}
+.stu-main{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:var(--r-sm);cursor:pointer;user-select:none}
+.stu-main:hover{background:var(--surface-raised)}
+.stu.sel .stu-main{box-shadow:0 0 0 2px var(--ring);background:var(--select-bg)}
+.stu-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{font-size:12px;font-variant-numeric:tabular-nums;border:1px solid var(--border-strong);border-radius:999px;padding:0 8px;color:var(--ink-muted);white-space:nowrap}
+.tag.none{border-style:dashed}
+.stu .mini{opacity:.55}
+.stu:hover .mini,.stu .mini:focus-visible,.stu .mini[aria-pressed="true"]{opacity:1}
+.empty-note{font-size:14px;color:var(--ink-muted);margin:0;padding:8px 4px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+
+/* Present mode */
+.present-bar{display:none}
+body.presenting .band,body.presenting .bar,body.presenting .side,body.presenting .tips{display:none}
+body.presenting .app{padding-block:12px;max-width:none}
+body.presenting .work{grid-template-columns:minmax(0,1fr)}
+body.presenting .chart-wrap{width:min(100%,calc((100dvh - 120px) / 0.93));margin-inline:auto}
+body.presenting .present-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+body.presenting .seat-tools,body.presenting .lockmark{display:none}
+.present-title{font-family:var(--font-display);font-weight:800;font-size:clamp(20px,2.4vw,34px);margin:0}
+
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:var(--r-sm);border:1px solid var(--gold);font-size:14px;z-index:50;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion: reduce){.room.spin{animation:none}*{transition:none!important}}
+</style>
+
+<header class="band">
+  <div class="band-in">
+    <div>
+      <p class="eyebrow">Mill Creek High School · Physics</p>
+      <h1>Seating charts</h1>
+    </div>
+    <div class="status" id="status" data-s="idle" aria-live="polite"><span class="dot"></span><span id="status-text">Loading your classes…</span></div>
+  </div>
+</header>
+
+<main class="app">
+  <div class="bar" id="bar"></div>
+  <div class="work">
+    <section class="chart-wrap" aria-label="Classroom">
+      <div class="present-bar" id="present-bar"></div>
+      <div class="room" id="room"></div>
+      <p class="tips">Click a student, then a seat. You can also drag names. Click two seats to swap them.</p>
+    </section>
+    <aside class="side" id="side"></aside>
+  </div>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+(() => {
+const TABLES = 17;
+const TEACHER_ROWS = [[17,16,15],[14,13,12],[11,10,9],[8,7,6],[5,4,3],['big',2,1]];
+const ICONS = {
+  shuffle:'<path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/>',
+  az:'<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M20 8h-5"/><path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10"/><path d="M15 14h5l-5 6h5"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  unlock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',
+  screen:'<rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>',
+  rotate:'<path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.5L21 8"/><path d="M21 3v5h-5"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  eraser:'<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/>'
+};
+const icon = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
+/* ---------- Prefs (per browser) ---------- */
+const PREF_KEY = 'mchs-seating-prefs';
+let prefs = { view:'teacher', nameFmt:'firstL', alphaBy:'last', newPartners:true, fillMode:'pairs', currentId:null };
+try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREF_KEY) || '{}')); } catch (e) {}
+const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} };
+
+/* ---------- State ---------- */
+const S = {
+  periods: {}, selected: null, presenting: false, spinning: false,
+  showNew: false, newName: '', showPaste: false, pasteText: '', renameText: null,
+  confirmDelete: false, undo: {}, dragging: null
+};
+const store = { mode: 'loading', col: null, note: '', loaded: false };
+
+const emptySeats = () => { const o = {}; for (let t = 1; t <= TABLES; t++) o[t] = [null, null]; return o; };
+function hydrate(id, d) {
+  const seats = emptySeats();
+  if (d.seats) for (let t = 1; t <= TABLES; t++) { const a = d.seats[t] || d.seats[String(t)]; if (Array.isArray(a)) seats[t] = [a[0] || null, a[1] || null]; }
+  return { id, name: d.name || 'Class period', createdAt: d.createdAt || Date.now(), updatedAt: d.updatedAt || 0,
+    students: Array.isArray(d.students) ? d.students.map(s => ({ id: s.id, first: s.first || '', last: s.last || '' })) : [],
+    seats, locks: Array.isArray(d.locks) ? d.locks.slice() : [] };
+}
+const serialize = p => ({ name: p.name, createdAt: p.createdAt, updatedAt: p.updatedAt, students: p.students, seats: p.seats, locks: p.locks });
+const ordered = () => Object.values(S.periods).sort((a, b) => a.createdAt - b.createdAt);
+const cur = () => S.periods[prefs.currentId] || null;
+function ensureCurrent() { if (!S.periods[prefs.currentId]) { const o = ordered(); prefs.currentId = o.length ? o[0].id : null; savePrefs(); } }
+function locate(p, sid) { for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (p.seats[t][s] === sid) return { t, s }; return null; }
+const byId = p => Object.fromEntries(p.students.map(s => [s.id, s]));
+
+/* ---------- Names ---------- */
+function parseNames(text) {
+  const out = [];
+  for (let raw of text.split(/\r?\n/)) {
+    let line = raw.replace(/^\s*\d+\s*[.):\-]\s*/, '').replace(/\S+@\S+/g, '').replace(/\b\d{4,}\b/g, '').trim();
+    if (!line) continue;
+    let first = '', last = '';
+    if (line.includes('\t')) {
+      const parts = line.split('\t').map(x => x.trim()).filter(Boolean);
+      if (parts.length >= 2) { last = parts[0]; first = parts[1]; } else first = parts[0] || '';
+    } else if (line.includes(',')) {
+      const i = line.indexOf(',');
+      last = line.slice(0, i).trim(); first = line.slice(i + 1).replace(/,/g, ' ').trim();
+    } else {
+      const w = line.split(/\s+/);
+      if (w.length === 1) first = w[0];
+      else {
+        let k = w.length - 1;
+        if (/^(jr|sr|ii|iii|iv)\.?$/i.test(w[k]) && k > 1) k--;
+        first = w.slice(0, k).join(' '); last = w.slice(k).join(' ');
+      }
+    }
+    first = first.replace(/\s+[A-Za-z]\.?$/, '').replace(/\s+/g, ' ').trim();
+    last = last.replace(/\s+/g, ' ').trim();
+    if (!first && !last) continue;
+    if (/^(student|name|last name|first name)s?$/i.test((first + ' ' + last).trim())) continue;
+    out.push({ first, last });
+  }
+  return out;
+}
+const keyOf = s => (s.first + '|' + s.last).toLowerCase().replace(/\s+/g, ' ');
+function nameFor(p, st) {
+  if (!st) return '';
+  const full = (st.first + ' ' + st.last).trim();
+  const initial = st.last ? ' ' + st.last[0].toUpperCase() + '.' : '';
+  const fl = st.first + initial;
+  if (prefs.nameFmt === 'full') return full;
+  if (prefs.nameFmt === 'first') {
+    const dup = p.students.some(o => o.id !== st.id && o.first.toLowerCase() === st.first.toLowerCase());
+    if (!dup) return st.first || full;
+    const dup2 = p.students.some(o => o.id !== st.id && (o.first + (o.last ? o.last[0] : '')).toLowerCase() === (st.first + (st.last ? st.last[0] : '')).toLowerCase());
+    return dup2 ? full : fl;
+  }
+  const dup = p.students.some(o => o.id !== st.id && (o.first + (o.last ? o.last[0] : '')).toLowerCase() === (st.first + (st.last ? st.last[0] : '')).toLowerCase());
+  return dup ? full : (st.first ? fl : full);
+}
+function cmpStudents(a, b) {
+  const k = s => prefs.alphaBy === 'first' ? [s.first || s.last, s.last] : [s.last || s.first, s.first];
+  const [a1, a2] = k(a), [b1, b2] = k(b);
+  return a1.localeCompare(b1, undefined, { sensitivity: 'base' }) || a2.localeCompare(b2, undefined, { sensitivity: 'base' });
+}
+
+/* ---------- Saving ---------- */
+const sv = { timers: {}, writing: {}, dirty: {} };
+const isPending = id => !!(sv.timers[id] || sv.writing[id] || sv.dirty[id]);
+function setStatus(s, text) {
+  const el = document.getElementById('status'); el.dataset.s = s;
+  document.getElementById('status-text').textContent = text;
+}
+function idleStatus() {
+  if (store.mode === 'loading') return setStatus('idle', 'Loading your classes…');
+  if (store.note) return setStatus('error', store.note);
+  if (store.mode === 'local') return setStatus('idle', 'Saved in this browser only');
+  setStatus('idle', 'All changes saved');
+}
+function scheduleSave(id, now) {
+  clearTimeout(sv.timers[id]);
+  setStatus('saving', 'Saving…');
+  sv.timers[id] = setTimeout(() => { sv.timers[id] = null; flush(id); }, now ? 0 : 600);
+}
+function saveLocalAll() {
+  try { localStorage.setItem('mchs-seating-periods', JSON.stringify(Object.values(S.periods).map(p => ({ id: p.id, ...serialize(p) })))); return true; }
+  catch (e) { return false; }
+}
+async function flush(id, retried) {
+  if (sv.writing[id]) { sv.dirty[id] = true; return; }
+  sv.writing[id] = true;
+  let ok = true, msg = '';
+  try {
+    if (store.mode === 'db') {
+      const p = S.periods[id];
+      if (p) await store.col.doc(id).set(serialize(p)); else await store.col.doc(id).delete();
+    } else if (!saveLocalAll()) { ok = false; msg = 'This browser blocked saving. Changes last until you close the tab.'; }
+  } catch (e) {
+    if (e && e.code === 'unavailable' && !retried) { sv.writing[id] = false; setTimeout(() => flush(id, true), 800 + Math.random() * 800); return; }
+    ok = false;
+    msg = e && e.code === 'quota_exceeded' ? 'Storage is full. Delete an old class period to keep saving.' : "Couldn't save the last change. Check your connection.";
+  }
+  sv.writing[id] = false;
+  if (sv.dirty[id]) { sv.dirty[id] = false; return flush(id); }
+  if (!ok) setStatus('error', msg);
+  else if (!Object.keys(sv.timers).some(k => sv.timers[k]) && !Object.values(sv.writing).some(Boolean)) idleStatus();
+}
+
+/* ---------- Mutations ---------- */
+function snapshotOf(p) { return JSON.stringify({ students: p.students, seats: p.seats, locks: p.locks }); }
+function mutate(fn, opts = {}) {
+  const p = cur(); if (!p) return;
+  const before = snapshotOf(p);
+  fn(p);
+  if (snapshotOf(p) === before && !opts.force) return;
+  if (opts.undoable !== false) { (S.undo[p.id] ||= []).push(before); if (S.undo[p.id].length > 40) S.undo[p.id].shift(); }
+  p.updatedAt = Date.now();
+  scheduleSave(p.id);
+  render();
+}
+function undo() {
+  const p = cur(); const st = p && S.undo[p.id];
+  if (!st || !st.length) return toast('Nothing to undo');
+  const prev = JSON.parse(st.pop());
+  p.students = prev.students; p.seats = prev.seats; p.locks = prev.locks; p.updatedAt = Date.now();
+  S.selected = null; scheduleSave(p.id); render();
+}
+function placeStudent(sid, t, s) {
+  mutate(p => {
+    const from = locate(p, sid);
+    const occupant = p.seats[t][s];
+    if (from && from.t === t && from.s === s) return;
+    p.seats[t][s] = sid;
+    if (from) p.seats[from.t][from.s] = occupant;  // swap back into the old seat (or leave it empty)
+  });
+}
+function swapSeats(a, b) {
+  mutate(p => { const x = p.seats[a.t][a.s]; p.seats[a.t][a.s] = p.seats[b.t][b.s]; p.seats[b.t][b.s] = x; });
+}
+function unseat(sid) { mutate(p => { const at = locate(p, sid); if (at) p.seats[at.t][at.s] = null; }); }
+function toggleLock(sid) { mutate(p => { const i = p.locks.indexOf(sid); if (i >= 0) p.locks.splice(i, 1); else p.locks.push(sid); }); }
+function removeStudent(sid) {
+  mutate(p => {
+    p.students = p.students.filter(s => s.id !== sid);
+    const at = locate(p, sid); if (at) p.seats[at.t][at.s] = null;
+    p.locks = p.locks.filter(x => x !== sid);
+  });
+  if (S.selected && S.selected.id === sid) S.selected = null;
+}
+function pairsOf(seats) {
+  const set = new Set();
+  for (let t = 1; t <= TABLES; t++) { const [a, b] = seats[t]; if (a && b) set.add([a, b].sort().join('|')); }
+  return set;
+}
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function arrange(kind) {
+  const p = cur(); if (!p) return;
+  if (!p.students.length) return toast('Add students to this period first');
+  let overflow = 0;
+  mutate(p => {
+    const prevPairs = pairsOf(p.seats);
+    const locked = new Set(p.locks.filter(id => locate(p, id)));
+    for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (p.seats[t][s] && !locked.has(p.seats[t][s])) p.seats[t][s] = null;
+    const free = [];
+    if (prefs.fillMode === 'spread') {
+      // Test day: one student per table first (tables with a locked student already count), then double up from table 1.
+      const used = new Set();
+      for (let t = 1; t <= TABLES; t++) if (!p.seats[t][0] && !p.seats[t][1]) { free.push([t, 0]); used.add(t + ':0'); }
+      for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (!p.seats[t][s] && !used.has(t + ':' + s)) free.push([t, s]);
+    } else {
+      for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (!p.seats[t][s]) free.push([t, s]);
+    }
+    let pool = p.students.filter(st => !locked.has(st.id));
+    overflow = Math.max(0, pool.length - free.length);
+    if (kind === 'alpha') pool = pool.slice().sort(cmpStudents).map(s => s.id);
+    else {
+      const ids = pool.map(s => s.id);
+      let best = null, bestScore = Infinity;
+      const tries = prefs.newPartners && prevPairs.size ? 400 : 1;
+      for (let k = 0; k < tries; k++) {
+        const order = shuffle(ids.slice());
+        const temp = {}; for (let t = 1; t <= TABLES; t++) temp[t] = p.seats[t].slice();
+        order.slice(0, free.length).forEach((id, i) => { const [t, s] = free[i]; temp[t][s] = id; });
+        let score = 0; for (const pr of pairsOf(temp)) if (prevPairs.has(pr)) score++;
+        if (score < bestScore) { best = order; bestScore = score; if (!score) break; }
+      }
+      pool = best;
+    }
+    pool.slice(0, free.length).forEach((id, i) => { const [t, s] = free[i]; p.seats[t][s] = id; });
+  }, { force: true });
+  S.selected = null;
+  if (overflow) toast(`Only 34 seats. ${overflow} student${overflow > 1 ? 's are' : ' is'} not seated.`);
+  else toast(kind === 'alpha' ? `Seated alphabetically by ${prefs.alphaBy} name` : 'Shuffled');
+}
+function clearSeats() {
+  mutate(p => {
+    for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (p.seats[t][s] && !p.locks.includes(p.seats[t][s])) p.seats[t][s] = null;
+  });
+  S.selected = null; render();
+}
+function applyPaste(mode) {
+  const names = parseNames(S.pasteText);
+  if (!names.length) return toast('Paste at least one name, one per line');
+  let added = 0;
+  mutate(p => {
+    const existing = new Map(p.students.map(s => [keyOf(s), s]));
+    if (mode === 'replace') {
+      const next = []; const seen = new Set();
+      for (const n of names) { const k = keyOf(n); if (seen.has(k)) continue; seen.add(k); next.push(existing.get(k) || { id: uid(), ...n }); }
+      const keep = new Set(next.map(s => s.id));
+      for (let t = 1; t <= TABLES; t++) for (let s = 0; s < 2; s++) if (p.seats[t][s] && !keep.has(p.seats[t][s])) p.seats[t][s] = null;
+      p.locks = p.locks.filter(id => keep.has(id));
+      p.students = next; added = next.length;
+    } else {
+      for (const n of names) { const k = keyOf(n); if (existing.has(k)) continue; const st = { id: uid(), ...n }; existing.set(k, st); p.students.push(st); added++; }
+    }
+  });
+  S.pasteText = ''; S.showPaste = false; render();
+  toast(mode === 'replace' ? `Roster set to ${added} students` : `Added ${added} student${added === 1 ? '' : 's'}`);
+}
+
+/* ---------- Periods ---------- */
+function createPeriod(name, students) {
+  const p = { id: 'p' + uid(), name: name.trim() || 'Class period', createdAt: Date.now(), updatedAt: Date.now(), students: students || [], seats: emptySeats(), locks: [] };
+  S.periods[p.id] = p; prefs.currentId = p.id; savePrefs();
+  scheduleSave(p.id, true);
+  return p;
+}
+const EXAMPLE = ['Rivera, Sofia','Okafor, Daniel','Nguyen, Emily','Patel, Arjun','Johnson, Malik','Kim, Grace','Thompson, Caleb','Garcia, Isabella','Williams, Jordan','Chen, Lucas','Brooks, Ava','Hernandez, Mateo','Davis, Chloe','Mensah, Kwame','Lopez, Valeria','Wright, Ethan','Singh, Priya','Carter, Noah','Ali, Zara','Morgan, Liam','Park, Hannah','Adeyemi, Tobi','Foster, Mia','Reyes, Diego','Bennett, Lily','Owens, Isaiah','Shah, Riya','Collins, Wyatt'];
+
+/* ---------- Render ---------- */
+function captureFocus() {
+  const a = document.activeElement; if (!a || !a.dataset || !a.dataset.key) return null;
+  return { key: a.dataset.key, ss: a.selectionStart, se: a.selectionEnd };
+}
+function restoreFocus(f) {
+  if (!f) return; const el = document.querySelector(`[data-key="${CSS.escape(f.key)}"]`); if (!el) return;
+  el.focus({ preventScroll: true });
+  if (f.ss != null && el.setSelectionRange) try { el.setSelectionRange(f.ss, f.se); } catch (e) {}
+}
+function render() {
+  const f = captureFocus();
+  ensureCurrent();
+  renderBar(); renderRoom(); renderSide(); renderPresentBar();
+  document.body.classList.toggle('placing', !!(S.selected && S.selected.kind === 'student'));
+  restoreFocus(f);
+  if (!Object.values(sv.timers).some(Boolean) && !Object.values(sv.writing).some(Boolean)) idleStatus();
+}
+function viewToggle(compact) {
+  return `<div class="seg" role="group" aria-label="Room orientation">
+    <button data-act="view" data-v="student" data-key="view-student" aria-pressed="${prefs.view === 'student'}" title="Front of room at the top, table 1 on top. For the projector.">Student view</button>
+    <button data-act="view" data-v="teacher" data-key="view-teacher" aria-pressed="${prefs.view === 'teacher'}" title="Front of room at the bottom, as you see it from the front.">Teacher view</button>
+  </div>`;
+}
+function renderBar() {
+  const list = ordered(); const p = cur();
+  let h = `<div class="periods" role="tablist" aria-label="Class periods">`;
+  for (const q of list) h += `<button class="chip" role="tab" data-act="period" data-id="${q.id}" data-key="period-${q.id}" aria-current="${q === p}">${esc(q.name)}</button>`;
+  if (S.showNew) {
+    h += `<form class="newform" data-form="new"><input id="new-name" data-key="new-name" placeholder="e.g. 3rd period Honors" value="${esc(S.newName)}" aria-label="New class period name" maxlength="60">
+      <button class="btn primary small" type="submit">Create</button><button class="btn small" type="button" data-act="cancel-new">Cancel</button></form>`;
+  } else if (store.loaded) {
+    h += `<button class="chip ghost" data-act="new-period" data-key="new-period">${icon('plus')}New period</button>`;
+  }
+  h += `</div><div class="viewctl">${viewToggle()}<button class="btn" data-act="present" data-key="present" ${p ? '' : 'disabled'}>${icon('screen')}Present</button></div>`;
+  document.getElementById('bar').innerHTML = h;
+}
+function renderPresentBar() {
+  const p = cur();
+  document.getElementById('present-bar').innerHTML = `<p class="present-title">${esc(p ? p.name : '')}</p>
+    <div class="viewctl">${viewToggle()}<button class="btn" data-act="exit-present" data-key="exit-present">${icon('x')}Exit</button></div>`;
+}
+function seatHTML(p, t, s, map) {
+  const sid = p ? p.seats[t][s] : null; const st = sid ? map[sid] : null;
+  const sel = S.selected && S.selected.kind === 'seat' && S.selected.t === t && S.selected.s === s;
+  const locked = st && p.locks.includes(sid);
+  const nm = st ? nameFor(p, st) : '';
+  const side = s === 0 ? 'left' : 'right';
+  return `<div class="seat ${st ? 'filled' : 'empty'}${sel ? ' sel' : ''}${locked ? ' locked' : ''}" data-t="${t}" data-s="${s}">
+    <div class="seat-main" role="button" tabindex="0" data-act="seat" data-key="seat-${t}-${s}" ${st ? 'draggable="true"' : ''} aria-label="Table ${t}, ${side} seat (students' ${side}): ${st ? esc(nm) + (locked ? ', locked' : '') : 'empty'}">${st ? `<span class="nm">${esc(nm)}</span>` : ''}</div>
+    ${locked ? `<span class="lockmark" aria-hidden="true">${icon('lock')}</span>` : ''}
+    ${st ? `<div class="seat-tools"><button class="mini" data-act="lock" data-id="${sid}" data-key="lock-${t}-${s}" aria-pressed="${!!locked}" title="${locked ? 'Unlock: can move when shuffling' : 'Lock: stays here when shuffling or sorting'}" aria-label="${locked ? 'Unlock' : 'Lock'} ${esc(nm)}">${icon(locked ? 'lock' : 'unlock')}</button><button class="mini" data-act="unseat" data-id="${sid}" data-key="unseat-${t}-${s}" title="Move back to the student list" aria-label="Unseat ${esc(nm)}">${icon('x')}</button></div>` : ''}
+  </div>`;
+}
+function renderRoom() {
+  const p = cur(); const map = p ? byId(p) : {};
+  const student = prefs.view === 'student';
+  const rows = student ? TEACHER_ROWS.slice().reverse().map(r => r.slice().reverse()) : TEACHER_ROWS;
+  const seatOrder = student ? [0, 1] : [1, 0];
+  const front = `<div class="wall front">Front of room</div>`;
+  const back = `<div class="wall back">Back of room</div>`;
+  let cells = '';
+  for (const c of rows.flat()) {
+    if (c === 'big') { cells += `<div class="big" aria-label="Supply table, no seats"><span>Supply<br>table</span></div>`; continue; }
+    cells += `<div class="table"><span class="tnum" aria-hidden="true">${c}</span><div class="seats">${seatOrder.map(s => seatHTML(p, c, s, map)).join('')}</div></div>`;
+  }
+  document.getElementById('room').innerHTML = (student ? front : back) + `<div class="grid">${cells}</div>` + (student ? back : front);
+}
+function renderSide() {
+  const side = document.getElementById('side');
+  if (store.mode === 'loading' || !store.loaded) { side.innerHTML = `<section class="panel"><h2>Classes</h2><p class="empty-note">Loading your saved class periods…</p></section>`; return; }
+  const p = cur();
+  if (!p) {
+    side.innerHTML = `<section class="panel"><h2>Start a class period</h2>
+      <p class="hint">Make one period per class, like “2nd period AP Physics 1”, then paste in that class's students. Each period keeps its own chart.</p>
+      <form class="row" data-form="first"><input class="text-in" id="first-name" data-key="first-name" placeholder="Period name" value="${esc(S.newName)}" aria-label="Period name" maxlength="60"><button class="btn primary" type="submit">${icon('plus')}Create</button></form>
+      <p class="hint">Want to see how it works first?</p>
+      <button class="btn" data-act="example" data-key="example">Load an example class</button></section>`;
+    return;
+  }
+  const map = byId(p);
+  const seated = [], unseated = [];
+  for (const st of p.students.slice().sort(cmpStudents)) (locate(p, st.id) ? seated : unseated).push(st);
+  const canUndo = (S.undo[p.id] || []).length > 0;
+  const stuLi = st => {
+    const at = locate(p, st.id); const locked = p.locks.includes(st.id);
+    const sel = S.selected && S.selected.kind === 'student' && S.selected.id === st.id;
+    const nm = (st.last ? `${st.first} ${st.last}` : st.first);
+    return `<li class="stu${sel ? ' sel' : ''}"><div class="stu-main" role="button" tabindex="0" draggable="true" data-act="stu" data-id="${st.id}" data-key="stu-${st.id}" aria-pressed="${!!sel}">
+        <span class="stu-name">${esc(nm)}</span>${at ? `<span class="tag">Table ${at.t}</span>` : `<span class="tag none">Not seated</span>`}</div>
+      ${at ? `<button class="mini" data-act="lock" data-id="${st.id}" data-key="slock-${st.id}" aria-pressed="${locked}" title="${locked ? 'Unlock' : 'Lock in this seat'}" aria-label="${locked ? 'Unlock' : 'Lock'} ${esc(nm)}">${icon(locked ? 'lock' : 'unlock')}</button>` : ''}
+      <button class="mini" data-act="remove" data-id="${st.id}" data-key="rm-${st.id}" title="Remove from this class" aria-label="Remove ${esc(nm)} from this class">${icon('x')}</button></li>`;
+  };
+  const renameVal = S.renameText ?? p.name;
+  side.innerHTML = `
+  <section class="panel" aria-label="Arrange">
+    <h2>Arrange</h2>
+    <div class="row">
+      <button class="btn primary" data-act="random" data-key="random">${icon('shuffle')}Random</button>
+      <button class="btn" data-act="alpha" data-key="alpha">${icon('az')}Alphabetical</button>
+    </div>
+    <div class="row"><span class="lbl">Seating</span>
+      <div class="seg" role="group" aria-label="How to fill tables"><button data-act="fill" data-v="pairs" data-key="fill-pairs" aria-pressed="${prefs.fillMode !== 'spread'}">Pairs</button><button data-act="fill" data-v="spread" data-key="fill-spread" aria-pressed="${prefs.fillMode === 'spread'}">Spread out</button></div></div>
+    <label class="chk"><input type="checkbox" id="opt-partners" data-key="opt-partners" ${prefs.newPartners ? 'checked' : ''}> Give everyone a new tablemate when I shuffle</label>
+    <div class="row"><span class="lbl">Alphabetical by</span>
+      <div class="seg" role="group" aria-label="Alphabetical by"><button data-act="alphaBy" data-v="last" data-key="ab-last" aria-pressed="${prefs.alphaBy === 'last'}">Last name</button><button data-act="alphaBy" data-v="first" data-key="ab-first" aria-pressed="${prefs.alphaBy === 'first'}">First name</button></div></div>
+    <div class="row">
+      <button class="btn small" data-act="undo" data-key="undo" ${canUndo ? '' : 'disabled'}>${icon('undo')}Undo</button>
+      <button class="btn small" data-act="clear" data-key="clear">${icon('eraser')}Clear seats</button>
+    </div>
+    <p class="hint">${prefs.fillMode === 'spread' ? 'Spread out gives every student their own table first, then doubles up starting at table 1. Good for test days.' : 'Pairs fills tables two at a time from table 1 back.'} Lock a student and they stay put when you shuffle, sort or clear.</p>
+  </section>
+  <section class="panel" aria-label="Students">
+    <h2>Students <span class="count">${p.students.length} total${unseated.length ? ` · ${unseated.length} not seated` : ''}</span></h2>
+    ${S.showPaste || !p.students.length ? `
+      <label class="lbl" for="paste-text">Paste names, one per line</label>
+      <textarea id="paste-text" data-key="paste-text" placeholder="Last, First&#10;or&#10;First Last">${esc(S.pasteText)}</textarea>
+      <div class="row">${p.students.length ? `<button class="btn primary small" data-act="paste-replace" data-key="paste-replace">Replace roster</button><button class="btn small" data-act="paste-add" data-key="paste-add">Add to roster</button><button class="btn small" data-act="paste-toggle" data-key="paste-cancel">Cancel</button>` : `<button class="btn primary small" data-act="paste-add" data-key="paste-add">Add students</button>`}</div>
+      ${p.students.length ? `<p class="hint">Replacing keeps seats for anyone whose name matches.</p>` : ''}`
+    : `<div class="row"><button class="btn small" data-act="paste-toggle" data-key="paste-toggle">${icon('users')}Paste names</button></div>`}
+    ${p.students.length ? `<ul class="roster" id="roster" data-drop="roster" aria-label="Student list">
+      ${unseated.length ? `<li class="group">Not seated (${unseated.length})</li>${unseated.map(stuLi).join('')}` : ''}
+      ${seated.length ? `<li class="group">Seated (${seated.length})</li>${seated.map(stuLi).join('')}` : ''}
+    </ul>` : ''}
+  </section>
+  <section class="panel" aria-label="Display">
+    <h2>Display</h2>
+    <div class="row"><span class="lbl">Names</span>
+      <div class="seg" role="group" aria-label="Name format">
+        <button data-act="fmt" data-v="firstL" data-key="fmt-firstL" aria-pressed="${prefs.nameFmt === 'firstL'}">Sofia R.</button>
+        <button data-act="fmt" data-v="full" data-key="fmt-full" aria-pressed="${prefs.nameFmt === 'full'}">Full</button>
+        <button data-act="fmt" data-v="first" data-key="fmt-first" aria-pressed="${prefs.nameFmt === 'first'}">First</button>
+      </div></div>
+    <button class="btn small" data-act="copy" data-key="copy">${icon('copy')}Copy chart as text</button>
+    <p class="hint">Handy for sub plans. Paste it into an email or doc.</p>
+  </section>
+  <section class="panel" aria-label="Class period settings">
+    <h2>This period</h2>
+    <form class="row" data-form="rename"><input class="text-in" id="rename" data-key="rename" value="${esc(renameVal)}" aria-label="Period name" maxlength="60"><button class="btn small" type="submit">Rename</button></form>
+    ${S.confirmDelete ? `<div class="confirm"><span>Delete ${esc(p.name)} and its chart?</span><button class="btn small danger" data-act="delete-yes" data-key="delete-yes">Delete</button><button class="btn small" data-act="delete-no" data-key="delete-no">Keep it</button></div>`
+      : `<div class="row"><button class="btn small danger" data-act="delete-ask" data-key="delete-ask">Delete period</button></div>`}
+  </section>`;
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+
+/* ---------- View rotation ---------- */
+function setView(v) {
+  if (v === prefs.view || S.spinning) return;
+  const room = document.getElementById('room');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const done = () => { room.classList.remove('spin'); S.spinning = false; prefs.view = v; savePrefs(); render(); };
+  if (reduce) return done();
+  S.spinning = true; room.classList.add('spin');
+  room.addEventListener('animationend', done, { once: true });
+  setTimeout(() => { if (S.spinning) done(); }, 900);
+}
+
+/* ---------- Present ---------- */
+function present(on) {
+  S.presenting = on; document.body.classList.toggle('presenting', on);
+  try {
+    if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+    if (!on && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  } catch (e) {}
+  render();
+}
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && S.presenting) { S.presenting = false; document.body.classList.remove('presenting'); render(); } });
+
+/* ---------- Copy ---------- */
+async function copyChart() {
+  const p = cur(); if (!p) return; const map = byId(p);
+  const lines = [`${p.name} — seating chart`, ''];
+  for (let t = 1; t <= TABLES; t++) {
+    const names = p.seats[t].map(id => id && map[id] ? `${map[id].first} ${map[id].last}`.trim() : null).filter(Boolean);
+    lines.push(`Table ${t}: ${names.length ? names.join(', ') : '(empty)'}`);
+  }
+  const un = p.students.filter(s => !locate(p, s.id));
+  if (un.length) lines.push('', 'Not seated: ' + un.map(s => `${s.first} ${s.last}`.trim()).join(', '));
+  const text = lines.join('\n');
+  try { await navigator.clipboard.writeText(text); toast('Chart copied'); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove(); toast(ok ? 'Chart copied' : 'Copy was blocked by this browser');
+  }
+}
+
+/* ---------- Events ---------- */
+function seatClick(t, s) {
+  const p = cur(); if (!p) return;
+  const sel = S.selected;
+  if (sel && sel.kind === 'student') { S.selected = null; placeStudent(sel.id, t, s); return; }
+  if (sel && sel.kind === 'seat') {
+    S.selected = null;
+    if (sel.t === t && sel.s === s) return render();
+    swapSeats(sel, { t, s }); render(); return;
+  }
+  if (p.seats[t][s]) { S.selected = { kind: 'seat', t, s }; render(); }
+  else if (p.students.some(st => !locate(p, st.id))) toast('Pick a student from the list first, then click this seat');
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  switch (act) {
+    case 'seat': { const seat = el.closest('.seat'); seatClick(+seat.dataset.t, +seat.dataset.s); break; }
+    case 'stu': {
+      const sel = S.selected;
+      if (sel && sel.kind === 'seat') { const p = cur(); const occ = p.seats[sel.t][sel.s]; S.selected = null; if (occ !== id) placeStudent(id, sel.t, sel.s); else render(); break; }
+      S.selected = sel && sel.kind === 'student' && sel.id === id ? null : { kind: 'student', id }; render(); break;
+    }
+    case 'lock': toggleLock(id); break;
+    case 'unseat': S.selected = null; unseat(id); break;
+    case 'remove': removeStudent(id); break;
+    case 'period': if (prefs.currentId !== id) { prefs.currentId = id; savePrefs(); S.selected = null; S.renameText = null; S.confirmDelete = false; S.showPaste = false; S.pasteText = ''; render(); } break;
+    case 'new-period': S.showNew = true; S.newName = ''; render(); setTimeout(() => document.getElementById('new-name')?.focus(), 0); break;
+    case 'cancel-new': S.showNew = false; render(); break;
+    case 'example': createPeriod('Example class', EXAMPLE.map(n => { const [l, f] = n.split(', '); return { id: uid(), first: f, last: l }; })); render(); arrange('random'); break;
+    case 'view': setView(el.dataset.v); break;
+    case 'present': present(true); break;
+    case 'exit-present': present(false); break;
+    case 'random': arrange('random'); break;
+    case 'alpha': arrange('alpha'); break;
+    case 'undo': undo(); break;
+    case 'clear': clearSeats(); break;
+    case 'alphaBy': prefs.alphaBy = el.dataset.v; savePrefs(); render(); break;
+    case 'fmt': prefs.nameFmt = el.dataset.v; savePrefs(); render(); break;
+    case 'fill': prefs.fillMode = el.dataset.v; savePrefs(); render(); toast(el.dataset.v === 'spread' ? 'Spread out: click Random or Alphabetical to reseat' : 'Pairs: click Random or Alphabetical to reseat'); break;
+    case 'paste-toggle': S.showPaste = !S.showPaste; render(); if (S.showPaste) setTimeout(() => document.getElementById('paste-text')?.focus(), 0); break;
+    case 'paste-replace': applyPaste('replace'); break;
+    case 'paste-add': applyPaste('add'); break;
+    case 'copy': copyChart(); break;
+    case 'delete-ask': S.confirmDelete = true; render(); break;
+    case 'delete-no': S.confirmDelete = false; render(); break;
+    case 'delete-yes': {
+      const p = cur(); if (!p) break;
+      delete S.periods[p.id]; delete S.undo[p.id]; S.confirmDelete = false; S.renameText = null; S.selected = null;
+      prefs.currentId = null; savePrefs(); scheduleSave(p.id, true); render(); toast('Period deleted'); break;
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if ((e.key === 'Enter' || e.key === ' ') && el.getAttribute && el.getAttribute('role') === 'button') { e.preventDefault(); el.click(); return; }
+  if (e.key === 'Escape') { if (S.presenting) present(false); else if (S.selected) { S.selected = null; render(); } else if (S.showNew) { S.showNew = false; render(); } }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !/^(INPUT|TEXTAREA)$/.test(el.tagName)) { e.preventDefault(); undo(); }
+});
+document.addEventListener('input', e => {
+  const id = e.target.id;
+  if (id === 'paste-text') S.pasteText = e.target.value;
+  else if (id === 'new-name' || id === 'first-name') S.newName = e.target.value;
+  else if (id === 'rename') S.renameText = e.target.value;
+});
+document.addEventListener('change', e => { if (e.target.id === 'opt-partners') { prefs.newPartners = e.target.checked; savePrefs(); } });
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target.dataset.form;
+  if (form === 'new' || form === 'first') {
+    const name = S.newName.trim(); if (!name) return toast('Give the period a name, like “2nd period”');
+    createPeriod(name); S.showNew = false; S.newName = ''; S.showPaste = true; render();
+    setTimeout(() => document.getElementById('paste-text')?.focus(), 0);
+  } else if (form === 'rename') {
+    const p = cur(); const name = (S.renameText ?? p.name).trim();
+    if (!name) return toast('The name can’t be blank');
+    p.name = name; p.updatedAt = Date.now(); S.renameText = null; scheduleSave(p.id); render(); toast('Renamed');
+  }
+});
+
+/* Drag and drop */
+document.addEventListener('dragstart', e => {
+  const seatMain = e.target.closest && e.target.closest('.seat-main');
+  const stu = e.target.closest && e.target.closest('.stu-main');
+  const p = cur(); if (!p) return;
+  if (seatMain) { const seat = seatMain.closest('.seat'); const t = +seat.dataset.t, s = +seat.dataset.s; if (!p.seats[t][s]) return e.preventDefault(); S.dragging = { kind: 'seat', t, s, id: p.seats[t][s] }; }
+  else if (stu) S.dragging = { kind: 'student', id: stu.dataset.id };
+  else return;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', S.dragging.id); } catch (err) {}
+  document.getElementById('roster')?.classList.toggle('dropzone', S.dragging.kind === 'seat');
+});
+document.addEventListener('dragover', e => {
+  if (!S.dragging) return;
+  const seat = e.target.closest && e.target.closest('.seat');
+  const roster = e.target.closest && e.target.closest('[data-drop="roster"]');
+  if (seat || (roster && S.dragging.kind === 'seat')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+  document.querySelectorAll('.seat.dragover').forEach(x => { if (x !== seat) x.classList.remove('dragover'); });
+  if (seat) seat.classList.add('dragover');
+});
+document.addEventListener('drop', e => {
+  if (!S.dragging) return; e.preventDefault();
+  const d = S.dragging; S.dragging = null; S.selected = null;
+  const seat = e.target.closest && e.target.closest('.seat');
+  const roster = e.target.closest && e.target.closest('[data-drop="roster"]');
+  if (seat) { const t = +seat.dataset.t, s = +seat.dataset.s; if (d.kind === 'seat') { if (d.t !== t || d.s !== s) swapSeats(d, { t, s }); else render(); } else placeStudent(d.id, t, s); }
+  else if (roster && d.kind === 'seat') unseat(d.id);
+  else render();
+});
+document.addEventListener('dragend', () => { S.dragging = null; document.querySelectorAll('.dragover').forEach(x => x.classList.remove('dragover')); document.getElementById('roster')?.classList.remove('dropzone'); });
+
+/* ---------- Boot ---------- */
+render();
+function loadLocal() {
+  try {
+    const arr = JSON.parse(localStorage.getItem('mchs-seating-periods') || '[]');
+    for (const d of arr) if (d && d.id) S.periods[d.id] = hydrate(d.id, d);
+  } catch (e) {}
+}
+function subscribe() {
+  let live = false;
+  const timer = setTimeout(() => { if (!live) { store.note = "Your saved classes can't be reached yet. Check your connection."; store.loaded = true; render(); } }, 10000);
+  store.col.onSnapshot(snap => {
+    const ids = new Set();
+    for (const d of snap.docs) {
+      ids.add(d.id); const data = d.data(); if (!data || isPending(d.id)) continue;
+      const loc = S.periods[d.id];
+      if (!loc || (data.updatedAt || 0) > (loc.updatedAt || 0)) S.periods[d.id] = hydrate(d.id, data);
+    }
+    if (!snap.metadata.fromCache) {
+      for (const id of Object.keys(S.periods)) if (!ids.has(id) && !isPending(id)) delete S.periods[id];
+      live = true; clearTimeout(timer); store.note = '';
+    }
+    store.loaded = true; render();
+  }, err => {
+    clearTimeout(timer); store.loaded = true;
+    store.note = err && err.code === 'revoked' ? 'Saving is no longer available on this page.' : "Saved classes are unavailable right now. Reload the page to try again.";
+    render();
+  });
+}
+(async () => {
+  let db = null, user = null, id = null;
+  try { if (window.claude && window.claude.use) [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); } catch (e) {}
+  if (user) { try { id = await user.id(); } catch (e) {} }
+  if (db && id) { store.mode = 'db'; store.col = db.collection('data/users/' + id); render(); subscribe(); }
+  else { store.mode = 'local'; loadLocal(); store.loaded = true; render(); }
+})();
+})();
+</script>
+
+</body>
+</html>
